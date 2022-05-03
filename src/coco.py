@@ -62,17 +62,22 @@ class COCOManager:
         self.coco.dataset['annotations'] = list(anns.values())
     
     #=== Functions ===#
-    def train_val_split(self, train_ratio=0.8, seed=123):
+    def train_val_split(self, train_num=None, train_ratio=None, seed=123):
+
+        assert train_num is not None or train_ratio is not None
 
         imgs    = self.get_imgs()
         img_ids = list(imgs.keys())
         img_num = len(img_ids)
 
+        if train_ratio is not None:
+            train_num = int(img_num * train_ratio)
+
         random.seed(seed)
         random.shuffle(img_ids)
 
-        train_img_ids = img_ids[:int(img_num * train_ratio)]
-        val_img_ids   = img_ids[int(img_num * train_ratio):]
+        train_img_ids = img_ids[:train_num]
+        val_img_ids   = img_ids[train_num:]
 
         train_coco = copy.deepcopy(self)
         train_coco.set_imgs(self.get_imgs_dict(train_img_ids))
